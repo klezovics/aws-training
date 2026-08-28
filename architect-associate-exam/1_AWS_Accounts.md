@@ -54,12 +54,48 @@ Hierarchy notes:
 - All resources are billed to the root account credit card
 - AWS is Pay-As-You-Go model -> also has a free tier
 
-## IAM
+# IAM Basics
 - In AIM you can create users/groups/roles
-- These can have full or limited permissions
-- Every identity starts with 0 permissions. You need to explicitly give them
+- IAM = no cost at all
+- IAM = deployed to every account automatically
+- IAM = global service, global resilience
+- IAM = Allow or DENY entities actions on resources (based on IAM policies)
+- IAM = control only within an account. No external control of anything.
+- IAM = support of identity federation(take identies from external sources) + MFA
+- IAM = Manage Identities + Authenticate Identities + Authorize Access to Resource(based on policies)
 
-## Terminology
+## AN
+- Identities = Users(humans or apps) + Groups(collections of related users) + Roles(used by AWS services or for external access)
+- These can have full or limited permissions
+- Every identity(except for root) starts with 0 permissions. You need to explicitly give them
+- Role = grant access to an uncertain number of entities
+- Individual thing, known count -> use user
+- Unknown count of things -> like all EC2 instances -> use a role
+
+## AZ
+- IAM policy(policy document) -> allow or deny actions on resources ONLY WHEN attached to identities
+- Policies on their own do nothing. Just a collection of ALLOW/DENY permissions
+- Root user is always fully trusted. Like root in Linux.
+- IAM service = root user privileges
+- Use the least privilege principle
+
+
+# IAM Access Keys
+- API keys are called Access Keys
+- Auth methods = user+password(console UI) + API keys(access keys)
+- ONLY users can have API keys. Roles cannot.
+- API keys = long-term credentials -> dont change automatically or regularly
+- IAM users = 1 username + 1 password (but can have only API key and no password)
+- IAM user = can have 0,1,2 API keys (2 are available for rotation)
+- API keys = create/delete/inactive/active
+
+## API key structure
+- API key structure = AccessKeyID + SecretAccessKey
+- API key SecretAccessKey part is showed ONLY ONCE. Write down
+- AccessKeyID is like a username, SecretAccessKey is the password
+- API keys are immutable. Cannot change SecretAccessKey value
+
+# Terminology
 - Nested accounts are created via Organisations
 - Management account = root account which owns the organisation
 - Member accounts = accounts for dev/stg/prd
