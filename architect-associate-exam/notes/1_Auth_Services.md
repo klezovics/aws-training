@@ -24,6 +24,7 @@
 - IAM = Who can do what ?
 - IAM = identities (user/group/role) + policies (permission/limit/trust)
 - IAM = within account + cross account
+- IAM = only two credential types: API keys + STS tokens. Both used to generate the signature
 
 - User/Group/Role -> slim objects
 - The heavy stuff are all the permissions objects. But they are just lists of statements

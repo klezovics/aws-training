@@ -1,25 +1,50 @@
 # Network
 Here's a global overview
+Networking has 3 kinds:
+- Within 1 VPC
+- Between 2+ VPCs
+- VPCs and outside world
+
 
 ## SERVICES (own API namespace, own console entry)
-- VPC -> king of network services. Defines most stuff.
-- Route53 -> DNS. Tells clients WHERE to connect. Traffic never passes through it.
-- ELB -> distributes traffic to your private compute. Types: ALB / NLB / GWLB.
-- API Gateway -> Kind of like ingress controller. allows to convert a lambda into an API
-- CloudFront -> the edge layer (CDN + WAF + TLS + edge compute)
-- Global Accelerator -> anycast static IPs on the AWS backbone
-- WAF -> L7 request filtering
-- Shield -> DDoS protection
-- Direct Connect -> dedicated fiber to AWS
-- Transit Gateway -> hub-and-spoke router for many VPCs + on-prem. Transitive.
-- Client VPN -> remote EMPLOYEES get into the VPC (vs Site-to-Site = office/DC into the VPC)
-- Cloud Map -> service discovery (registry of live task IPs)
+Grouped by the 3 kinds above.
 
-Marginal, know they exist:
-- AWS Network Firewall -> managed stateful firewall for a whole VPC (IPS/IDS, domain filtering).
+### 1. Within 1 VPC
+- VPC -> king of network services. Defines most stuff (subnets, routing, SG/NACL).
+- ELB -> distributes traffic to your private compute. Types: ALB / NLB / GWLB.
+  Internet-facing ones straddle kind 3, but the targets always live in your VPC.
+- Cloud Map -> service discovery (registry of live task IPs)
+- AWS Network Firewall (marginal) -> managed stateful firewall for a whole VPC (IPS/IDS, domain filtering).
   Sits above SG/NACL: SG is per-ENI, NACL is per-subnet, Network Firewall is per-VPC with deep inspection.
-- Cloud WAN -> managed global WAN, builds/monitors a multi-region network from a central policy.
+
+### 2. Between 2+ VPCs
+- Transit Gateway -> hub-and-spoke router for many VPCs + on-prem. Transitive.
+  Its route tables are also how you STOP VPCs reaching each other (segmentation).
+- (VPC peering and PrivateLink do this too, but they are components, not services -> see below)
+- Cloud WAN (marginal) -> managed global WAN, builds/monitors a multi-region network from a central policy.
   Think "Transit Gateway, but global and policy-driven". Rare on the exam.
+
+### 3. VPC <-> outside world
+The bucket splits by WHAT the other end is. Mixing these up is where exam questions bite.
+
+a) The internet, INBOUND (the edge layer):
+- CloudFront -> CDN + TLS + edge compute. HTTP(S) only.
+- Global Accelerator -> anycast static IPs on the AWS backbone. CloudFront's L4 sibling, non-HTTP.
+- API Gateway -> kind of like an ingress controller. Turns a Lambda into an API.
+
+b) The internet, OUTBOUND: no service, only components -> IGW / NAT GW / egress-only IGW.
+
+c) Your datacenter or your laptops:
+- Direct Connect -> dedicated fiber to AWS. Private, not over the internet.
+- Client VPN -> remote EMPLOYEES get into the VPC (vs Site-to-Site = office/DC into the VPC)
+
+d) AWS public services (S3, DynamoDB, SSM, most APIs): no service, only components -> VPC endpoints.
+   These live OUTSIDE your VPC on the AWS public zone. "Outside the VPC" != "on the internet".
+
+### Cross-cutting (not a path, they attach to one)
+- Route53 -> DNS. Tells clients WHERE to connect. Traffic never passes through it.
+- WAF -> L7 request filtering. Attaches to CloudFront / ALB / REST API.
+- Shield -> DDoS protection. Standard free+automatic, Advanced paid.
 
 ## CONCEPTS / COMPONENTS (resources INSIDE a service, not services themselves)
 Inside VPC:
@@ -72,6 +97,7 @@ Inside API Gateway:
 
 ## VPC
 - VPC lives in a region
+- VPC<->IGW = 1:1 relationship. VPC can have at most 1 IGW. IGW is attached to at most 1 VPC.
 - VPC spans several AZs and can have subnets in them
 - Subnet is pinned to exactly ONE AZ, forever
 - All private services have their ENI in your VPC
