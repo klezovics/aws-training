@@ -20,11 +20,11 @@ Account
 
 Three facts that explain most confusion:
 
-| Fact | Why it matters |
-|---|---|
-| A VPC **spans** AZs | The AZ is not "inside" the VPC. They are two independent axes. |
-| A subnet = **one VPC × one AZ** | This is why HA always means "one subnet per AZ". Fixed at creation. |
-| Everything private has an **ENI** | The ENI is the thing that has an IP and holds security groups. |
+| Fact                              | Why it matters                                                      |
+|-----------------------------------|---------------------------------------------------------------------|
+| A VPC **spans** AZs               | The AZ is not "inside" the VPC. They are two independent axes.      |
+| A subnet = **one VPC × one AZ**   | This is why HA always means "one subnet per AZ". Fixed at creation. |
+| Everything private has an **ENI** | The ENI is the thing that has an IP and holds security groups.      |
 
 k8s analogy: VPC ≈ the cluster network, subnet ≈ a zone's node pool, ENI ≈ a pod's network interface.
 
@@ -32,12 +32,12 @@ k8s analogy: VPC ≈ the cluster network, subnet ≈ a zone's node pool, ENI ≈
 
 ## 2. The objects
 
-| Object | Lives in | One-liner |
-|---|---|---|
-| **VPC** | Region | The network. CIDR `/16`–`/28`. Primary CIDR is immutable. |
-| **Subnet** | One AZ | A slice of the VPC CIDR, pinned to one AZ forever. |
-| **Route table** | VPC | Attached to subnets. Says where packets go. Longest prefix wins. |
-| **ENI** | One AZ | The actual network card. Holds private IP, optional public IP, security groups. |
+| Object          | Lives in | One-liner                                                                       |
+|-----------------|----------|---------------------------------------------------------------------------------|
+| **VPC**         | Region   | The network. CIDR `/16`–`/28`. Primary CIDR is immutable.                       |
+| **Subnet**      | One AZ   | A slice of the VPC CIDR, pinned to one AZ forever.                              |
+| **Route table** | VPC      | Attached to subnets. Says where packets go. Longest prefix wins.                |
+| **ENI**         | One AZ   | The actual network card. Holds private IP, optional public IP, security groups. |
 
 **Gotcha — 5 IPs are reserved per subnet.** First four + last address.
 A `/24` gives you **251** usable, not 256.
@@ -57,6 +57,7 @@ By default a VPC is sealed. Nothing in, nothing out. You add exactly one of thes
 The door to the outside. One IGW ↔ one VPC. Regionally resilient.
 
 Does **two** things:
+
 1. Route target for internet + AWS public zone.
 2. **Static 1:1 NAT** — maps the instance's private IP ↔ its public IP.
 
@@ -67,13 +68,13 @@ Does **two** things:
 
 Lets **private** subnets reach out. Outbound only — nothing can dial in.
 
-| | |
-|---|---|
-| Where it lives | In a **public** subnet (not the private one it serves) |
-| Needs | An Elastic IP |
-| Scope | **One AZ.** One NAT gateway = SPOF + cross-AZ data charges. Use one per AZ. |
-| Cost | Hourly **and** per GB processed — this is the expensive one |
-| IP version | IPv4 only |
+|                |                                                                             |
+|----------------|-----------------------------------------------------------------------------|
+| Where it lives | In a **public** subnet (not the private one it serves)                      |
+| Needs          | An Elastic IP                                                               |
+| Scope          | **One AZ.** One NAT gateway = SPOF + cross-AZ data charges. Use one per AZ. |
+| Cost           | Hourly **and** per GB processed — this is the expensive one                 |
+| IP version     | IPv4 only                                                                   |
 
 ### Egress-only IGW
 
@@ -95,13 +96,13 @@ Legacy. An EC2 doing NAT yourself. Only reason left: you need port forwarding or
 
 ## 4. Firewalls: SG vs NACL
 
-| | Security group | NACL |
-|---|---|---|
-| Attaches to | **ENI** | **Subnet** |
-| Stateful? | **Yes** — reply traffic is automatic | **No** — you need rules both directions |
-| Can deny? | **No, allow-only** | **Yes** |
-| Multiple rules | All SGs unioned, no order | Numbered, **first match wins** |
-| How many | 5 per ENI (max 16) | 1 per subnet |
+|                | Security group                       | NACL                                    |
+|----------------|--------------------------------------|-----------------------------------------|
+| Attaches to    | **ENI**                              | **Subnet**                              |
+| Stateful?      | **Yes** — reply traffic is automatic | **No** — you need rules both directions |
+| Can deny?      | **No, allow-only**                   | **Yes**                                 |
+| Multiple rules | All SGs unioned, no order            | Numbered, **first match wins**          |
+| How many       | 5 per ENI (max 16)                   | 1 per subnet                            |
 
 **SGs only ever widen.** Adding a second SG can never restrict anything, so there are no
 conflicts and no ordering to reason about.
@@ -111,6 +112,7 @@ conflicts and no ordering to reason about.
 ```
 internet → sg-alb → sg-web → sg-db
 ```
+
 Each tier allows only from the tier in front. No IP addresses anywhere. Survives autoscaling.
 
 **SGs cannot block anything.** No deny rule exists.
@@ -125,14 +127,14 @@ You only get it if you specify no SG at launch.
 
 Problem: S3 is a public-zone service. Your instance is in a private subnet. How?
 
-| | Gateway endpoint | Interface endpoint (PrivateLink) |
-|---|---|---|
-| Works for | **S3 + DynamoDB only** | Almost everything else |
-| What it is | A **route table entry** | An **ENI with a private IP** in your subnet |
-| DNS | Unchanged (still the public IP) | Private DNS → the ENI |
-| Cost | **Free** | Hourly + per GB |
-| From on-prem? | No | Yes (via DX/VPN) |
-| Region | Same region only | — |
+|               | Gateway endpoint                | Interface endpoint (PrivateLink)            |
+|---------------|---------------------------------|---------------------------------------------|
+| Works for     | **S3 + DynamoDB only**          | Almost everything else                      |
+| What it is    | A **route table entry**         | An **ENI with a private IP** in your subnet |
+| DNS           | Unchanged (still the public IP) | Private DNS → the ENI                       |
+| Cost          | **Free**                        | Hourly + per GB                             |
+| From on-prem? | No                              | Yes (via DX/VPN)                            |
+| Region        | Same region only                | —                                           |
 
 > A VPC with **no IGW and no NAT** can still call S3, SQS, KMS, and Secrets Manager —
 > entirely through endpoints. That is the "fully private" architecture.
@@ -145,14 +147,14 @@ It is a bill fix as much as a security one.
 
 ## 6. Connecting to other networks
 
-| Option | Direction | Key limitation |
-|---|---|---|
-| **VPC peering** | VPC ↔ VPC | **Non-transitive**, no overlapping CIDRs. *N* VPCs need *N(N−1)/2* links. |
-| **Transit Gateway** | Hub for many | **Transitive**. This is what peering can't do. |
-| **Site-to-Site VPN** | Office/DC → VPC | IPsec over the public internet. |
-| **Client VPN** | Laptop → VPC | For individual remote employees. |
-| **Direct Connect** | Fibre → VPC | Consistent latency. **Not encrypted by default.** |
-| **VPC link** | API Gateway → **into** your VPC | The reverse direction. Targets ALB/NLB/Cloud Map, never a raw IP. |
+| Option               | Direction                       | Key limitation                                                            |
+|----------------------|---------------------------------|---------------------------------------------------------------------------|
+| **VPC peering**      | VPC ↔ VPC                       | **Non-transitive**, no overlapping CIDRs. *N* VPCs need *N(N−1)/2* links. |
+| **Transit Gateway**  | Hub for many                    | **Transitive**. This is what peering can't do.                            |
+| **Site-to-Site VPN** | Office/DC → VPC                 | IPsec over the public internet.                                           |
+| **Client VPN**       | Laptop → VPC                    | For individual remote employees.                                          |
+| **Direct Connect**   | Fibre → VPC                     | Consistent latency. **Not encrypted by default.**                         |
+| **VPC link**         | API Gateway → **into** your VPC | The reverse direction. Targets ALB/NLB/Cloud Map, never a raw IP.         |
 
 ---
 
@@ -169,12 +171,12 @@ It is a bill fix as much as a security one.
 
 ## 8. Default VPC (know how it differs)
 
-| | Default VPC | Custom VPC |
-|---|---|---|
-| CIDR | Always `172.31.0.0/16` | You choose |
-| Subnets | One `/20` per AZ, rest unused | You choose |
-| IGW | Attached | None until you add one |
-| Auto-assign public IP | **On** | **Off** |
+|                       | Default VPC                   | Custom VPC             |
+|-----------------------|-------------------------------|------------------------|
+| CIDR                  | Always `172.31.0.0/16`        | You choose             |
+| Subnets               | One `/20` per AZ, rest unused | You choose             |
+| IGW                   | Attached                      | None until you add one |
+| Auto-assign public IP | **On**                        | **Off**                |
 
 Consequence: every region's default VPC has the **same CIDR**, so they can never be peered.
 
@@ -185,11 +187,11 @@ Treat it as a scratchpad, not a foundation.
 
 ## 9. Scope cheat sheet
 
-| Scope | Objects |
-|---|---|
-| **Region** | VPC, internet gateway |
-| **VPC** | Route table, security group, NACL |
-| **AZ** | Subnet, NAT gateway, ENI, EC2 instance, EBS volume |
+| Scope      | Objects                                            |
+|------------|----------------------------------------------------|
+| **Region** | VPC, internet gateway                              |
+| **VPC**    | Route table, security group, NACL                  |
+| **AZ**     | Subnet, NAT gateway, ENI, EC2 instance, EBS volume |
 
 Anything in the AZ row is a thing you must duplicate per AZ for high availability.
 
@@ -197,12 +199,12 @@ Anything in the AZ row is a thing you must duplicate per AZ for high availabilit
 
 ## 10. Debugging: what each failure looks like
 
-| Symptom | It's almost certainly |
-|---|---|
-| Hangs, then times out | **No route** — missing NAT, endpoint, or route table entry |
-| Times out, no error | **SG or NACL** dropping packets silently |
-| Instant `AccessDenied` / `403` | **IAM** — not a networking problem at all |
-| Auth/signature error | **Wrong regional endpoint** (region is baked into the SigV4 signature) |
+| Symptom                        | It's almost certainly                                                  |
+|--------------------------------|------------------------------------------------------------------------|
+| Hangs, then times out          | **No route** — missing NAT, endpoint, or route table entry             |
+| Times out, no error            | **SG or NACL** dropping packets silently                               |
+| Instant `AccessDenied` / `403` | **IAM** — not a networking problem at all                              |
+| Auth/signature error           | **Wrong regional endpoint** (region is baked into the SigV4 signature) |
 
 > **Connectivity problems hang. Permission problems fail fast.**
 > That one line will save you hours.
@@ -211,14 +213,14 @@ Anything in the AZ row is a thing you must duplicate per AZ for high availabilit
 
 ## Glossary
 
-| | |
-|---|---|
-| **AZ** | Availability zone |
-| **CIDR** | An IP range like `10.0.0.0/16` |
-| **DX** | Direct Connect |
-| **EIP** | Elastic IP — a static public IPv4 you own |
-| **ENI** | Elastic network interface — the virtual network card |
-| **IGW** | Internet gateway |
-| **NACL** | Network access control list |
-| **NAT / PAT** | Network / port address translation |
-| **SPOF** | Single point of failure |
+|               |                                                      |
+|---------------|------------------------------------------------------|
+| **AZ**        | Availability zone                                    |
+| **CIDR**      | An IP range like `10.0.0.0/16`                       |
+| **DX**        | Direct Connect                                       |
+| **EIP**       | Elastic IP — a static public IPv4 you own            |
+| **ENI**       | Elastic network interface — the virtual network card |
+| **IGW**       | Internet gateway                                     |
+| **NACL**      | Network access control list                          |
+| **NAT / PAT** | Network / port address translation                   |
+| **SPOF**      | Single point of failure                              |
