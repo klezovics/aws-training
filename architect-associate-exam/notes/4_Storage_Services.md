@@ -2,7 +2,10 @@
 
 Service:
 S3 -> file store. Main way in/out of AWS.
-
+RDS/Aurora -> relational 
+EBS/EFS -> these are for EC2 instances.
+ElastiCache -> caches liek Redis or Memcached
+DynamoDB -> NoSQL K:V store for massive scale simple data access patterns
 
 # Storage Service Details
 
