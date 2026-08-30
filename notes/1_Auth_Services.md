@@ -33,3 +33,6 @@ Policy types:
 - Permission policy -> give permissions -> identity/resource policies
 - Limit policies -> limit which permissions can be given
 - Trust policies -> determine who can assume role
+
+# Further notes
+- Each compute service has each own unique abstraction which binds a role to this specific workload type i.e `InstanceProfile`
