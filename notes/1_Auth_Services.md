@@ -1,5 +1,12 @@
 # Auth service overview
 
+# Key facts
+- Two identity types: user&role. Group is used to group users.
+- Two credential types: API Keys & STS tokens
+- Two auth paradigms: AWS endpoints is AIM, for a hosted app, it handles its own auth in an app specific way
+- Each compute service has each own unique abstraction which binds a role to this specific workload type i.e `InstanceProfile`
+
+# Service overview
 - IAM = supreme king of AN/AZ
 - STS = just issues short lived tokens
 - IAM Identity Center -> SSO accross accounts (nice login panel)
@@ -33,6 +40,3 @@ Policy types:
 - Permission policy -> give permissions -> identity/resource policies
 - Limit policies -> limit which permissions can be given
 - Trust policies -> determine who can assume role
-
-# Further notes
-- Each compute service has each own unique abstraction which binds a role to this specific workload type i.e `InstanceProfile`

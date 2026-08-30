@@ -7,6 +7,14 @@ EBS/EFS -> these are for EC2 instances.
 ElastiCache -> caches liek Redis or Memcached
 DynamoDB -> NoSQL K:V store for massive scale simple data access patterns
 
+# Key facts
+There are these main storage paradigms:
+- Object storage -> S3
+- File/block storage -> EBS/EFS/Ephemeral storage
+- Database storage -> Dividens into SQL (RDS) and NoSQL(various formats)
+- Caches -> ElastiCache
+- Managed storage apps -> MSK
+
 # Storage Service Details
 
 # S3 
