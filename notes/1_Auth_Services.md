@@ -14,6 +14,7 @@ Resource policy main use cases:
 - Anon and cross-account access
 - Service principals. Allow certain services to do stuff on resource like AWS Lambda
 - Same-account guardrails. Deny non-TLS, restrict to a VPC endpoint
+- KMS key policies are always mandatory. Must permit even for root account.
 
 # Service overview
 - IAM = supreme king of AN/AZ
