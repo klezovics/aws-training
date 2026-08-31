@@ -6,6 +6,7 @@
 - Two credential types: API Keys & STS tokens
 - Two auth paradigms: AWS endpoints is AIM, for a hosted app, it handles its own auth in an app specific way
 - Each compute service has each own unique abstraction which binds a role to this specific workload type i.e `InstanceProfile`
+- A key question for every service: are data plane ops secured bu IAM(S3) or data plane ops secured by own auth (RDS/EC2 SSH)
 
 - SCP (Service control policies for orgs)
 - SCP = limit admin perms -> prevent disabling security stuff, run costly stuff, compliance (limit regions)
