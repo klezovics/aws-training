@@ -1,10 +1,19 @@
 # Auth service overview
 
 # Key facts
+- You mostly attach policies to identities and configure account organisational tree
 - Two identity types: user&role. Group is used to group users.
 - Two credential types: API Keys & STS tokens
 - Two auth paradigms: AWS endpoints is AIM, for a hosted app, it handles its own auth in an app specific way
 - Each compute service has each own unique abstraction which binds a role to this specific workload type i.e `InstanceProfile`
+
+- SCP (Service control policies for orgs)
+- SCP = limit admin perms -> prevent disabling security stuff, run costly stuff, compliance (limit regions)
+
+Resource policy main use cases:
+- Anon and cross-account access
+- Service principals. Allow certain services to do stuff on resource like AWS Lambda
+- Same-account guardrails. Deny non-TLS, restrict to a VPC endpoint
 
 # Service overview
 - IAM = supreme king of AN/AZ
