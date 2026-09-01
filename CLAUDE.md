@@ -33,3 +33,19 @@ lecture/topic, with supporting images in `architect-associate-exam/img/`.
   NOT hit the Secrets Manager Agent daemon directly. MUST use
   `{{resolve:secretsmanager:secret-id:SecretString:json-key}}` with
   `asm-exec` so the secret resolves at runtime without entering context.
+
+# Service understanding notes
+
+Yep — this was the AWS service description template we aligned on:
+This is called service matrix
+
+Essence of the service — what it fundamentally does
+Global or regional — scope and where it lives
+Main logical resources — the key entities/resources you create
+Main API operations — important create/read/update/delete/use actions
+Common use cases — when you actually use it
+Important features/configuration — major knobs, modes, capabilities
+Security — IAM, encryption, access control, network/security considerations
+Cost model — what you pay for
+Integrations — important AWS services it connects with
+Constraints/limits -> important constraints and limits

@@ -5,6 +5,14 @@ Networking has 3 kinds:
 - Between 2+ VPCs
 - VPCs and outside world
 
+VPC decomposition:
+- VPC archtecture -> VPC list, divison to subnets, which subnet in which AZ
+- Routing/access -> ensure there's a valid route connecting all necessary stuff
+- Access control -> SGs/NACLs, firewalling and secure access
+- DNS -> minor topic
+
+What makes networking simple:
+- Only two firewall primitives: SG and NACL
 
 ## SERVICES (own API namespace, own console entry)
 Grouped by the 3 kinds above.

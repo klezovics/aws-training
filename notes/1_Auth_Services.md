@@ -1,4 +1,7 @@
 # Auth service overview
+Two key aspects
+1) Managing identities and assigning policies to them directly or indirectly
+2) Managing the account and organisation tree
 
 # Key facts
 - You mostly attach policies to identities and configure account organisational tree
