@@ -1,5 +1,30 @@
 # ECS
 # ECS Concepts
+ECS = allow to run containers
+ECS = simpler K8S basically
+ECS inputs = containers + how to run them
+ECS cluster = where your containers run
+
+Concepts:
+- Container definition -> where you container comes from and exposed ports.
+- Task definition -> one or more containers. Its like the app itself. TASK ROLE key concept!! Other stuff like resources.
+- Service definition -> how to scale your task. Wraps your task. Restarts, HA.
+
+# ECS cluster modes:
+- EC2 mode -> you manage the instances in the cluster. More admin overhead. Can scale in/out.
+- Fargate -> no instance to manage. Less admin overhead. Kind of serverless. Pay only for deployed containers.
+- Fargate containers -> injected into your VPC subnets via ENI. But run on Fargate external platform.
+- ECS anywhere -> can run stuff on-prem
+
+Workload modes in practice
+- EC2
+- ECS (EC2)
+- Fargate
+
+Have containers -> always go for ECS
+ECS EC2 mode -> large workload, need to save money
+Fargate -> if want less ops go for this. Small/burst workloads. Batch/periodic workload when necessary.
+
 # ECS Cluster Mode
 # ECR
 - Like DockerHub, but only private in AWS
