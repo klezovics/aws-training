@@ -139,3 +139,28 @@ Advanced stuff:
 # NAT and NAT Gateway
 - NAT allows outbound connections, but not inbound
 - Useful to allow stuff in VPC to get updates, but keep the stuff inside the VPC hidden
+
+- NAT. Remap SRC or DST IPs.
+- IGW does static NAT anyway.
+- NAT does IP masquerading - hiding CIDR Blocks behind one IP.
+- NAT allows to save on IPs. Gives a private CIDR range outgoing internet access.
+- NAT Gateway -> does this thingy.
+- We can provision a NAT Gateway into the public (web tier) subnet.
+- Then for the private subnets, we point the default route to the NAT gateway in the public subnet
+- NAT gateway key DS = translation table
+- So you route from private IPs to NAT GW and it in turn can connect to IGW and move data
+
+NAT GW:
+- Must run from public subnet
+- Needs an Elastic IP
+- AZ resilient service (HA in that AZ) -> need 1 in each AZ. And point AZ routes there. 
+- NAT GW pricing: time + traffic per Gb
+- REMEMBER: NAT Gateway is AZ resilient, not region resilient, unlike IGW
+- NAT instances -> alternative to NAT GW
+- NAT instance can be much cheaper, but higher ops burden and risks
+- NAT GW cannot be used as bastion host, etc, cuz managed service
+- NAT instances = just EC2 instances. Can do filter
+- NAT GW = only NACL, no SGs
+- NAT is not required for IPv6. All IPv6 are publicly routable. If you have EC2 with IPv6 and IGW its automatically publicly available
+- NAT GW don't work with IPv6 !!! Key exam notice !!
+- Egress only IGW can give outbound only to IPv6 ENIs

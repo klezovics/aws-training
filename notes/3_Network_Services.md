@@ -5,11 +5,63 @@ Networking has 3 kinds:
 - Between 2+ VPCs
 - VPCs and outside world
 
-VPC decomposition:
+
+
+# VPC aspects
+VPC aspects:
 - VPC archtecture -> VPC list, divison to subnets, which subnet in which AZ
 - Routing/access -> ensure there's a valid route connecting all necessary stuff
 - Access control -> SGs/NACLs, firewalling and secure access
 - DNS -> minor topic
+
+VPC
+├── Addressing        CIDR, IPv6, EIP, auto-assign
+├── Segmentation      Subnets (AZ-bound), Route tables, ENI
+├── Security          SG (stateful, ENI), NACL (stateless, subnet)
+├── Egress/Ingress    IGW, NAT GW, EGW
+├── Private/Hybrid    Endpoints, Peering, TGW, VPN, DX
+├── DNS               resolver, DHCP options
+└── Observability     Flow Logs, Mirroring
+
+# VPC logical resources
+- Region = container for VPCs
+- VPC = container for subnets
+- Subnets = container for ENIs
+
+## VPC level
+- VPC
+- Subnets
+
+## Subnet level
+- Routing table
+
+## ENI level
+- ENI
+VPC structure:
+- VPC
+- 
+- Routing tables
+- ENI
+
+Security:
+- SG
+- NACL
+
+Public connectivity:
+- IGW/Egress-only IGW
+- NAT GW
+- Elastic IP
+
+# Understanding Subnets
+Subnet = container for ENI
+
+Key props:
+- AZ -> determines access to EBS volumes 
+- CIDR range/IPv6 range -> its size (immutable after creation)
+- Distinct routing table -> key advantage (?)
+- Distinct NACL -> typically left on PERMIT ALL
+- Auto-assign Public IPv4 flag
+
 
 What makes networking simple:
 - Only two firewall primitives: SG and NACL
